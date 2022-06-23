@@ -1,3 +1,53 @@
+# Necessary flags
+DEVICE_PATH := device/motorola/guamp
+PRODUCT_COMPATIBLE_PROPERTY_OVERRIDE := true
+TARGET_SCREEN_HEIGHT := 1600
+TARGET_SCREEN_WIDTH := 720
+PRODUCT_BUILD_RECOVERY_IMAGE := true
+TARGET_NO_RECOVERY := false
+PRODUCT_USE_DYNAMIC_PARTITIONS := true
+BOARD_BUILD_PRODUCT_IMAGE := true
+BOARD_BUILD_VENDOR_IMAGE := true
+PRODUCT_BUILD_SUPER_PARTITION := false
+PRODUCT_COMPATIBLE_PROPERTY_OVERRIDE := true
+
+# A/B
+AB_OTA_UPDATER := true
+AB_OTA_PARTITIONS := boot dtbo vbmeta
+AB_OTA_PARTITIONS += product system vendor
+AB_OTA_PARTITIONS += vbmeta_system recovery 
+AB_OTA_POSTINSTALL_CONFIG += RUN_POSTINSTALL_system=true
+AB_OTA_POSTINSTALL_CONFIG += POSTINSTALL_PATH_system=system/bin/otapreopt_script
+AB_OTA_POSTINSTALL_CONFIG += POSTINSTALL_OPTIONAL_system=true
+AB_OTA_POSTINSTALL_CONFIG += FILESYSTEM_TYPE_system=ext4
+
+# Assert
+TARGET_OTA_ASSERT_DEVICE := guamp
+
+# SOONG Namespaces
+PRODUCT_SOONG_NAMESPACES += device/motorola/guamp kernel/motorola/guamp vendor/motorola/guamp hardware/qcom-caf/bootctrl
+
+# Enable updating of APEXes
+$(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
+
+# Get non-open-source specific aspects
+$(call inherit-product, vendor/motorola/guamp/guamp-vendor.mk)
+
+# VINTF
+PRODUCT_ENFORCE_VINTF_MANIFEST := true
+PRODUCT_ENFORCE_RRO_TARGETS := *
+PRODUCT_ENFORCE_RRO_EXCLUDED_OVERLAYS += $(LOCAL_PATH)/overlay-lineage/lineage-sdk
+PRODUCT_ENFORCE_RRO_EXCLUDED_OVERLAYS += $(LOCAL_PATH)/overlay-lineage/packages/apps/Snap
+
+# Overlays
+DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay 
+DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/overlay-lineage
+
+# Debug
+PRODUCT_PROPERTY_OVERRIDES := persist.sys.usb.config=mtp,adb ro.adb.secure=0
+PRODUCT_PROPERTY_OVERRIDES += ro.secure=0 ro.debuggable=1 
+PRODUCT_PROPERTY_OVERRIDES += ro.control_privapp_permissions=log
+
 # Audio
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/audio/Bluetooth_split_audio_V1.cfg:$(TARGET_COPY_OUT_VENDOR)/etc/Bluetooth_split_audio_V1.cfg \
